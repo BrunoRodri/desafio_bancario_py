@@ -1,22 +1,6 @@
 from datetime import datetime
+import textwrap
 # Desafio Banco
-
-menu = """
-################################################################
-                           MENU
-
-                        [d] Depositar
-                        [s] Sacar
-                        [e] Extrato
-                        [nu] Novo Usuário
-                        [nc] Criar Conta
-                        [lc] Listar Clientes
-                        [cc] Listar Contas
-                        [q] Sair
-
-################################################################
-
-=> """
 
 ########## Variáveis e constantes###########
 usuarios = []
@@ -30,6 +14,25 @@ LIMITE_TRANSACOES =10
 mascara_ptbr = "%d/%m/%Y %H:%M"
 
 ############ Funções ############
+def menu():
+    menu = """
+    ########################## MENU ###############################
+                           
+
+                        [d]\tDepositar
+                        [s]\tSacar
+                        [e]\tExtrato
+                        [nu]\tNovo Usuário
+                        [nc]\tCriar Conta
+                        [lc]\tListar Clientes
+                        [cc]\tListar Contas
+                        [q]\tSair
+
+    ###############################################################
+
+=> """
+    return input(textwrap.dedent(menu)).strip().lower()
+
 def depositar(saldo, extrato, numero_transacoes):
     if numero_transacoes == LIMITE_TRANSACOES:
         print("Número máximo de transações diárias atingido!")
@@ -149,7 +152,7 @@ opcoes_menu = {
 }
 
 while True:
-  opcao = input(menu).strip().lower()
+  opcao = menu()
   acao = opcoes_menu.get(opcao)
 
   if acao:
