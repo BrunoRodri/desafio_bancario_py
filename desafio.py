@@ -30,27 +30,32 @@ LIMITE_TRANSACOES =10
 mascara_ptbr = "%d/%m/%Y %H:%M"
 
 ############ Funções ############
-def depositar(saldo, valor_deposito, extrato, numero_transacoes):
-  if numero_transacoes == LIMITE_TRANSACOES:
-    print("Número máximo de transações diárias atingido!")
-  elif valor_deposito > 0:
-    saldo += valor_deposito
-    numero_transacoes += 1
-    data_hora_atual = datetime.now()
-    extrato += f"Deposito: R$ {valor_deposito:.2f} {data_hora_atual.strftime(mascara_ptbr)}\n"
-    print(f"Deposito efetuado com sucesso! Saldo atual: R$ {saldo:.2f}")
-  else:
-    print("Valor de deposito inválido!")
-  return saldo, extrato, numero_transacoes
+def depositar(saldo, extrato, numero_transacoes):
+    if numero_transacoes == LIMITE_TRANSACOES:
+        print("Número máximo de transações diárias atingido!")
+        return saldo, extrato, numero_transacoes
 
-def sacar(saldo, valor_saque, extrato, numero_transacoes, limite):
+    valor_deposito = float(input("Informe o valor do depósito: "))
+    if valor_deposito > 0:
+        saldo += valor_deposito
+        numero_transacoes += 1
+        data_hora_atual = datetime.now()
+        extrato += f"Depósito: R$ {valor_deposito:.2f} {data_hora_atual.strftime(mascara_ptbr)}\n"
+        print(f"Depósito efetuado com sucesso! Saldo atual: R$ {saldo:.2f}")
+    else:
+        print("Valor de depósito inválido!")
+    return saldo, extrato, numero_transacoes
 
+def sacar(saldo, extrato, numero_transacoes, limite):
+    if numero_transacoes >= LIMITE_TRANSACOES:
+      print("Número máximo de transações diários atingido!")
+      return saldo, extrato, numero_transacoes
+    
+    valor_saque = float(input("Informe o valor do saque: "))
     if valor_saque > saldo:
         print("Saldo insuficiente!")
     elif valor_saque > limite:
         print("O valor do saque excede o limite!")
-    elif numero_transacoes >= LIMITE_TRANSACOES:
-        print("Número máximo de saques diários atingido!")
     elif valor_saque > 0:
         saldo -= valor_saque
         numero_transacoes += 1
@@ -133,8 +138,8 @@ def sair():
     exit()
 
 opcoes_menu = {
-    "d": lambda: depositar(saldo, float(input("Informe o valor do depósito: ")), extrato, numero_transacoes),
-    "s": lambda: sacar(saldo, float(input("Informe o valor do saque: ")), extrato, numero_transacoes, limite),
+    "d": lambda: depositar(saldo, extrato, numero_transacoes),
+    "s": lambda: sacar(saldo, extrato, numero_transacoes, limite),
     "e": lambda: exibir_extrato(saldo, extrato),
     "nu": lambda: criar_usuario(usuarios),
     "nc": lambda: criar_conta(usuarios),
