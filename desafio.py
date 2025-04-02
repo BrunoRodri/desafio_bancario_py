@@ -8,19 +8,28 @@ menu = """
                         [d] Depositar
                         [s] Sacar
                         [e] Extrato
+                        [nu] Novo Usuário
+                        [nc] Criar Conta
+                        [lc] Listar Clientes
+                        [cc] Listar Contas
                         [q] Sair
 
 ################################################################
 
 => """
 
+########## Variáveis e constantes###########
+usuarios = []
+contas = []
 saldo = 0
 limite = 500
 extrato = ""
 numero_transacoes = 0
+AGENCIA = "0001"
 LIMITE_TRANSACOES =10
 mascara_ptbr = "%d/%m/%Y %H:%M"
 
+############ Funções ############
 def depositar(saldo, valor_deposito, extrato, numero_transacoes):
   if numero_transacoes == LIMITE_TRANSACOES:
     print("Número máximo de transações diárias atingido!")
@@ -51,22 +60,107 @@ def sacar(saldo, valor_saque, extrato, numero_transacoes, limite):
         print("Valor de saque inválido!")
     return saldo, extrato, numero_transacoes
 
-while True:
-
-  opcao = input(menu)
-
-  if opcao == "d":
-    valor_deposito = float(input("Informe o valor do deposito: "))
-    saldo, extrato, numero_transacoes = depositar(saldo, valor_deposito, extrato, numero_transacoes)
-  elif opcao == "s":
-    valor_saque = float(input("Informe o valor do saque: "))
-    saldo, extrato, numero_transacoes = sacar(saldo, valor_saque, extrato, numero_transacoes, limite)
-  elif opcao == "e":
+def exibir_extrato(saldo, extrato):
     print("\nExtrato:")
     print("Não foram realizadas movimentações." if not extrato else extrato)
     print(f"Saldo atual: R$ {saldo:.2f}")
-  elif opcao == "q":
+
+def criar_usuario(usuarios):
+    cpf = input("Informe o CPF (somente números): ")
+
+    for usuario in usuarios:
+        if usuario["cpf"] == cpf:
+            print("Usuário já cadastrado!")
+            return
+        
+    nome = input("Informe o nome do usuário: ")
+    data_nascimento = input("Informe a data de nascimento (ddmmyyyy): ")
+
+    # Endereço
+    logradouro = input("Informe o logradouro: ")
+    numero = input("Informe o número: ")
+    bairro = input("Informe o bairro: ")
+    cidade = input("Informe a cidade: ")
+    estado = input("Informe a sigla do estado (UF): ")
+    endereco = f"{logradouro}, {numero} - {bairro}, {cidade}/{estado}"
+
+    usuarios.append({
+       "nome": nome,
+        "data_nascimento": data_nascimento,
+       "cpf": cpf,
+        "endereco": endereco
+    })
+    print("Usuário criado com sucesso!")
+
+def criar_conta(usuarios):
+
+    cpf = input("Informe o CPF do usuário: ")
+    usuario_encontrado = False
+    for usuario in usuarios:
+        if usuario["cpf"] == cpf:
+            usuario_encontrado = True
+            break
+    if not usuario_encontrado:
+        print("Usuário não encontrado!")
+        return
+    
+    numero_conta = len(contas) + 1
+    contas.append({
+        "numero_conta": numero_conta,
+        "usuario": usuario["nome"],
+        "cpf": cpf,
+    })
+    
+    print(f"Conta criada com sucesso! Número da conta: {numero_conta}")
+
+def listar_usuarios(usuarios):
+    if not usuarios:
+        print("Nenhum usuário cadastrado.")
+    else:
+      for usuario in usuarios:
+        print(f"Nome: {usuario['nome']}, Data Nascimento: {usuario['data_nascimento']} CPF: {usuario['cpf']}, Endereço: {usuario['endereco']}")
+
+def listar_contas(contas):
+    if not contas:
+        print("Nenhuma conta cadastrada.")
+    else:
+        for conta in contas:
+            print(f"Agencia:{AGENCIA}, Conta: {conta['numero_conta']}, Nome: {conta['usuario']} CPF: {conta['cpf']}")
+            
+def sair():
     print("Saindo do sistema...")
-    break
+    exit()
+
+opcoes_menu = {
+    "d": lambda: depositar(
+       saldo, 
+       float(input("Informe o valor do deposito: ")), 
+       extrato, 
+       numero_transacoes
+       ),
+    "s": lambda: sacar(
+       saldo, 
+       float(input("Informe o valor do saque: ")), 
+       extrato, 
+       numero_transacoes, 
+       limite
+       ),
+    "e": lambda: exibir_extrato(saldo, extrato),
+    "nu": lambda: criar_usuario(usuarios),
+    "nc": lambda: criar_conta(usuarios),
+    "lc": lambda: listar_usuarios(usuarios),
+    "cc": lambda: listar_contas(contas),
+    "q": sair
+}
+
+# Programa Principal
+
+while True:
+  opcao = input(menu).strip().lower()
+  acao = opcoes_menu.get(opcao)
+
+  if acao:
+    acao()
   else:
     print("Opção inválida! Tente Novamente")
+
