@@ -44,6 +44,7 @@ def depositar(saldo, valor_deposito, extrato, numero_transacoes):
   return saldo, extrato, numero_transacoes
 
 def sacar(saldo, valor_saque, extrato, numero_transacoes, limite):
+
     if valor_saque > saldo:
         print("Saldo insuficiente!")
     elif valor_saque > limite:
@@ -132,19 +133,8 @@ def sair():
     exit()
 
 opcoes_menu = {
-    "d": lambda: depositar(
-       saldo, 
-       float(input("Informe o valor do deposito: ")), 
-       extrato, 
-       numero_transacoes
-       ),
-    "s": lambda: sacar(
-       saldo, 
-       float(input("Informe o valor do saque: ")), 
-       extrato, 
-       numero_transacoes, 
-       limite
-       ),
+    "d": lambda: depositar(saldo, float(input("Informe o valor do depósito: ")), extrato, numero_transacoes),
+    "s": lambda: sacar(saldo, float(input("Informe o valor do saque: ")), extrato, numero_transacoes, limite),
     "e": lambda: exibir_extrato(saldo, extrato),
     "nu": lambda: criar_usuario(usuarios),
     "nc": lambda: criar_conta(usuarios),
@@ -153,14 +143,16 @@ opcoes_menu = {
     "q": sair
 }
 
-# Programa Principal
-
 while True:
   opcao = input(menu).strip().lower()
   acao = opcoes_menu.get(opcao)
 
   if acao:
-    acao()
+    resultado = acao()
+
+    if resultado:
+            if isinstance(resultado, tuple):  
+                saldo, extrato, numero_transacoes = resultado
   else:
     print("Opção inválida! Tente Novamente")
 
