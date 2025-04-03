@@ -6,10 +6,6 @@ import textwrap
 LIMITE_TRANSACOES = 10
 AGENCIA = "0001"
 
-# Variáveis globais
-usuarios = []
-contas = []
-
 class Cliente:
     def __init__(self, endereco):
         self.endereco = endereco
@@ -193,34 +189,32 @@ def menu():
 => """
     return input(textwrap.dedent(menu)).strip().lower()
 
-def depositar():
+def depositar(usuarios, contas):
     cpf = input("Informe o CPF do titular: ")
-    conta = buscar_conta_por_cpf(cpf)
+    conta = buscar_conta_por_cpf(cpf, contas)
     if conta:
         valor = float(input("Informe o valor do depósito: "))
         transacao = Deposito(valor)
         conta.realizar_transacao(transacao)
 
-
-def sacar():
+def sacar(usuarios, contas):
     cpf = input("Informe o CPF do titular: ")
-    conta = buscar_conta_por_cpf(cpf)
+    conta = buscar_conta_por_cpf(cpf, contas)
     if conta:
         valor = float(input("Informe o valor do saque: "))
         transacao = Saque(valor)
         conta.realizar_transacao(transacao)
 
-
-def exibir_extrato():
+def exibir_extrato(usuarios, contas):
     cpf = input("Informe o CPF do titular: ")
-    conta = buscar_conta_por_cpf(cpf)
+    conta = buscar_conta_por_cpf(cpf, contas)
     if conta:
         print("\n=== Extrato ===")
         for transacao in conta.historico.transacoes:
             print(f"{transacao['tipo']}: R$ {transacao['valor']:.2f} em {transacao['data']}")
         print(f"\nSaldo atual: R$ {conta.saldo:.2f}")
 
-def criar_usuario(usuarios):
+def criar_usuario(usuarios, contas):
     cpf = input("Informe o CPF (somente números): ")
     for usuario in usuarios:
         if usuario.cpf == cpf:
@@ -235,8 +229,20 @@ def criar_usuario(usuarios):
     usuarios.append(usuario)
     print("\n=== Usuário criado com sucesso! ===")
 
+def listar_usuarios(usuarios):
+    if not usuarios:
+        print("\n@@@ Nenhum cliente cadastrado! @@@")
+        return
 
-def criar_conta(usuarios):
+    print("\n=== Lista de Clientes ===")
+    for usuario in usuarios:
+        print("=" * 50)
+        print(f"Nome: {usuario.nome}")
+        print(f"CPF: {usuario.cpf}")
+        print(f"Endereço: {usuario.endereco}")
+        print("=" * 50)
+
+def criar_conta(usuarios, contas):
     cpf = input("Informe o CPF do usuário: ")
     usuario = next((u for u in usuarios if u.cpf == cpf), None)
     if not usuario:
@@ -249,7 +255,6 @@ def criar_conta(usuarios):
     contas.append(conta)
     print("\n=== Conta criada com sucesso! ===")
 
-
 def listar_contas(contas):
     for conta in contas:
         print("=" * 50)
@@ -257,22 +262,24 @@ def listar_contas(contas):
 
 
 def executar_menu():
+    usuarios = []
+    contas = []
+
     while True:
         opcao = menu()
 
         if opcao == "d":
-            depositar()
+            depositar(usuarios, contas)
         elif opcao == "s":
-            sacar()
+            sacar(usuarios, contas)
         elif opcao == "e":
-            exibir_extrato()
+            exibir_extrato(usuarios, contas)
         elif opcao == "nu":
-            criar_usuario(usuarios)
+            criar_usuario(usuarios, contas)
         elif opcao == "nc":
-            criar_conta(usuarios)
+            criar_conta(usuarios, contas)
         elif opcao == "lc":
-            for usuario in usuarios:
-                print(f"Nome: {usuario.nome}, CPF: {usuario.cpf}")
+            listar_usuarios(usuarios)
         elif opcao == "cc":
             listar_contas(contas)
         elif opcao == "q":
@@ -282,7 +289,7 @@ def executar_menu():
             print("\n@@@ Opção inválida! Tente novamente. @@@")
 
 
-def buscar_conta_por_cpf(cpf):
+def buscar_conta_por_cpf(cpf, contas):
     for conta in contas:
         if conta.cliente.cpf == cpf:
             return conta
