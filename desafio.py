@@ -260,6 +260,12 @@ def listar_contas(contas):
         print("=" * 50)
         print(conta)
 
+def buscar_conta_por_cpf(cpf, contas):
+    for conta in contas:
+        if conta.cliente.cpf == cpf:
+            return conta
+    print("\n@@@ Conta não encontrada! @@@")
+    return None
 
 def executar_menu():
     usuarios = []
@@ -287,14 +293,6 @@ def executar_menu():
             break
         else:
             print("\n@@@ Opção inválida! Tente novamente. @@@")
-
-
-def buscar_conta_por_cpf(cpf, contas):
-    for conta in contas:
-        if conta.cliente.cpf == cpf:
-            return conta
-    print("\n@@@ Conta não encontrada! @@@")
-    return None
 
 
 # Executar o sistema
